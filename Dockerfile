@@ -47,7 +47,10 @@ VOLUME ["/data"]
 
 # Ensure the database doesn't get lost to the container
 ENV DIMENSION_DB_PATH=/data/dimension.db
-
+HEALTHCHECK --interval=5s --timeout=3s --start-period=5s \
+    CMD wget -qS -O /dev/null localhost:8184/api/v1/dimension/health \
+        | awk -F':' '$1 ~ / Status$/ { print $2 ~ /200 OK/ }' || exit 1
+        
 EXPOSE 8184
 # CMD ["/bin/sh"]
 ENTRYPOINT ["/docker-entrypoint.sh"]
